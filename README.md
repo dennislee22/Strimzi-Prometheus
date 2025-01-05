@@ -1,4 +1,4 @@
-# Strimzi & Prometheus+Grafana
+# Strimzi/Kafka & Prometheus+Grafana
 
 <img width="198" alt="image" src="https://github.com/user-attachments/assets/41901918-f3d5-472a-b38e-5be2173b7d3e" />
 
