@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: strimzi-prometheus
+  labels:
+    app: strimzi
+spec:
+  replicas: 1
+  serviceAccountName: infra-prometheus-operator-prometheus
+  podMonitorSelector:
+    matchLabels:
+      app: strimzi
+  serviceMonitorSelector: {}
+  resources:
+    requests:
+      memory: 400Mi
+  enableAdminAPI: false
+  ruleSelector:
+    matchLabels:
+      role: alert-rules
+      app: strimzi
+  alerting:
+    alertmanagers:
+    - namespace: dlee-kafkanodepool
+      name: alertmanager
+      port: alertmanager
