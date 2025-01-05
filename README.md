@@ -204,7 +204,7 @@ strimzi-prometheus   ClusterIP   10.43.70.125   <none>        9090/TCP,8080/TCP 
 10. In Grafana, configure a new datasource using the newly created Prometheus service endpoint `http://strimzi-prometheus.infra-prometheus.svc.cluster.local:9090`.
 <img width="1432" alt="image" src="https://github.com/user-attachments/assets/4ce1e925-92fc-4aef-9010-22df44bd396e" />
 
-11. The final step is import the [Grafana template for Strimzi](https://github.com/strimzi/strimzi-kafka-operator/tree/0.43.0/examples/metrics/grafana-dashboards) into Grafana.
+11. The final step is import the [Grafana template for Strimzi](https://github.com/strimzi/strimzi-kafka-operator/tree/0.43.0/examples/metrics/grafana-dashboards) into Grafana and view the newly created dashboard.
 <img width="1426" alt="image" src="https://github.com/user-attachments/assets/9ec19c88-3e72-4df8-bb6e-998a9d3b98ed" />
 
 <img width="1432" alt="image" src="https://github.com/user-attachments/assets/74b5b5fd-dcf1-4658-bacc-6e3e5a0cf1a0" />
