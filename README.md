@@ -13,7 +13,7 @@ In this article, I will deploy the Cloudera Streams Messaging Operator, which is
 # kubectl create ns strimzi-kafka
 ```
 
-2. Create a secret object to store the Cloudera credentials. This secret object must exist in the namespace where you install Strimzi as well as all namespaces where you deploy Kafka or Kafka Connect clusters.   
+2. Create a secret object to store the Cloudera credentials.
 ```
 # kubectl create secret docker-registry strimzi --docker-server container.repository.cloudera.com --docker-username xxx --docker-password yyy --namespace strimzi-kafka
 ```
@@ -28,7 +28,7 @@ In this article, I will deploy the Cloudera Streams Messaging Operator, which is
 # helm install strimzi-cluster-operator --namespace strimzi-kafka --set 'image.imagePullSecrets[0].name=strimzi' --set-file clouderaLicense.fileContent=/root/license.txt --set watchAnyNamespace=true oci://container.repository.cloudera.com/cloudera-helm/csm-operator/strimzi-kafka-operator --version 1.2.0-b54
 ```
 
-5. Upon successful deployment, verify the existence of the following objects
+5. Upon successful deployment, verify the existence of the following objects.
 ```
 # kubectl -n strimzi-kafka get secret
 NAME                                             TYPE                             DATA   AGE
@@ -46,7 +46,7 @@ strimzi-cluster-operator-56c85645-6xswd   1/1     Running   0          41s
 ## Deploy `KafkaNodePool`
 KafkaNodePool refer to groups of Kafka broker nodes that share similar configurations and resources within a Kafka cluster. By using node pools, operators can tailor resource allocation, scaling, and fault tolerance across different broker nodes, ensuring optimal performance and isolation for varying workloads or traffic patterns.
 
-1. Create a new namespace.
+1. Create a new namespace to host the KafkaNodePool.
 ```
 # kubectl create ns dlee-kafkanodepool
 ```
@@ -123,7 +123,7 @@ spec:
           key: zookeeper-metrics-config.yml
 ```
 
-3. Ensure that `podmonitor` CRD has already been created in your K8s cluster.
+3. Ensure that `PodMonitor` CRD has already been created in your K8s cluster. Otherwise, check out the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/installation.md) installation procedure to install this CRD.
 
 ```
 # kubectl get crds | grep podmonitor
@@ -179,10 +179,38 @@ prometheus-strimzi-prometheus-0                                   2/2     Runnin
 
 ```
 
-4. Create a new `prometheus` object in your existing Prometheus namespace.
+7. Create the `prometheus-k8s-rules` PrometheusRule object.
+
+```
+# kubectl -n infra-prometheus apply -f prometheus-rules.yaml
+
+# kubectl -n infra-prometheus get PrometheusRule prometheus-k8s-rules
+NAME                   AGE
+prometheus-k8s-rules   5h28m
+```
+
+8. Prometheus can now scrape the Kakfa metrics. You may check out the Prometheus dashboard to verify this.
+<img width="1436" alt="image" src="https://github.com/user-attachments/assets/1edf6f84-7b3d-4849-8825-78168e83b68d" />
+
+9. Create a new Prometheus dashboard service in the K8s cluster. The internal URL endpoint of this service will later be used as the datasource in Grafana.
+
+```
+# kubectl -n infra-prometheus apply -f strimzi-prometheus-svc.yaml
+
+# kubectl -n infra-prometheus get svc strimzi-prometheus
+NAME                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)             AGE
+strimzi-prometheus   ClusterIP   10.43.70.125   <none>        9090/TCP,8080/TCP   4h27m
+```
+
+10. In Grafana, configure a new datasource using the newly created Prometheus service endpoint `http://strimzi-prometheus.infra-prometheus.svc.cluster.local:9090`.
+<img width="1432" alt="image" src="https://github.com/user-attachments/assets/4ce1e925-92fc-4aef-9010-22df44bd396e" />
+    
+11. The final step is import the [Grafana template for Strimzi](https://github.com/strimzi/strimzi-kafka-operator/tree/0.43.0/examples/metrics/grafana-dashboards) via your Grafana dashboard.
+<img width="1426" alt="image" src="https://github.com/user-attachments/assets/9ec19c88-3e72-4df8-bb6e-998a9d3b98ed" />
+
 <img width="1432" alt="image" src="https://github.com/user-attachments/assets/74b5b5fd-dcf1-4658-bacc-6e3e5a0cf1a0" />
 
-https://github.com/strimzi/strimzi-kafka-operator/tree/0.43.0/examples/metrics/grafana-dashboards
 
-<img width="1436" alt="image" src="https://github.com/user-attachments/assets/1edf6f84-7b3d-4849-8825-78168e83b68d" />
+
+
 
