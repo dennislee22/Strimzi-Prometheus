@@ -43,22 +43,22 @@ NAME                                      READY   STATUS    RESTARTS   AGE
 strimzi-cluster-operator-56c85645-6xswd   1/1     Running   0          41s
 ```
 
-## Deploy `Kafka Node Pool`
-Kafka node pools refer to groups of Kafka broker nodes that share similar configurations and resources within a Kafka cluster. By using node pools, operators can tailor resource allocation, scaling, and fault tolerance across different broker nodes, ensuring optimal performance and isolation for varying workloads or traffic patterns.
+## Deploy `KafkaNodePool`
+KafkaNodePool refer to groups of Kafka broker nodes that share similar configurations and resources within a Kafka cluster. By using node pools, operators can tailor resource allocation, scaling, and fault tolerance across different broker nodes, ensuring optimal performance and isolation for varying workloads or traffic patterns.
 
 1. Create a new namespace.
 ```
 # kubectl create ns dlee-kafkanodepool
 ```
 
-https://docs.cloudera.com/csm-operator/1.2/kafka-deploy-configure/topics/csm-op-deploying-kafka.html#concept_oks_bgz_z1c
+2. Create the KafkaNodePool by applying the `kafkanodepool.yml` file.
+```
+# kubectl -n dlee-kafkanodepool apply -f kafkanodepool.yml
+```
 
+3. Verify the successful creation of the pods in the Kafka pool, as shown below.
 ```
-oc -n dlee-kafkanodepool apply -f kafkanodepool.yml
-```
-
-```
-oc -n dlee-kafkanodepool get pods
+# kubectl -n dlee-kafkanodepool get pods
 NAME                                          READY   STATUS    RESTARTS   AGE
 my-cluster-cruise-control-874d98876-6zwt2     1/1     Running   0          93s
 my-cluster-entity-operator-86d4659f96-rpbt8   2/2     Running   0          114s
@@ -71,7 +71,7 @@ my-cluster-zookeeper-2                        1/1     Running   0          3m38s
 ```
 
 ```
-oc -n dlee-kafkanodepool get pvc
+# kubectl -n dlee-kafkanodepool get pvc
 NAME                             STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 data-0-my-cluster-first-pool-0   Bound    pvc-3b848807-3f92-4185-a624-b946ed90ead2   100Gi      RWO            longhorn       2m57s
 data-0-my-cluster-first-pool-1   Bound    pvc-246e1bc2-2f41-4323-b240-a2f2fd4e7b33   100Gi      RWO            longhorn       2m57s
@@ -81,6 +81,47 @@ data-my-cluster-zookeeper-1      Bound    pvc-d6641d3c-d833-4b8f-b473-e470b71c36
 data-my-cluster-zookeeper-2      Bound    pvc-555299e5-d5f3-4a84-957a-49f07df0c6ff   100Gi      RWO            longhorn       3m50s
 ```
 
+4. The Kafka cluster above is not yet configured for metrics collection. To enable this, create a ConfigMap containing the JMX metrics configuration for both Kafka and ZooKeeper.
+
+```
+# kubectl -n dlee-kafkanodepool apply -f kafka-metrics-cm.yml
+
+# kubectl -n dlee-kafkanodepool get cm
+NAME                                      DATA   AGE
+kafka-metrics                             2      6h38m
+kube-root-ca.crt                          1      7h2m
+my-cluster-cruise-control-config          3      6h44m
+my-cluster-entity-topic-operator-config   1      6h44m
+my-cluster-entity-user-operator-config    1      6h44m
+my-cluster-first-pool-0                   5      6h45m
+my-cluster-first-pool-1                   5      6h45m
+my-cluster-first-pool-2                   5      6h45m
+my-cluster-zookeeper-config               3      6h46m
+```
+
+5. Edit kafka object to include the following configuration.
+```
+# kubectl -n dlee-kafkanodepool edit kafka
+
+#...
+kind: Kafka
+spec:
+  kafka:
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          name: kafka-metrics
+          key: kafka-metrics-config.yml
+  zookeeper:
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          name: kafka-metrics
+          key: zookeeper-metrics-config.yml
+```
+   
 <img width="1432" alt="image" src="https://github.com/user-attachments/assets/74b5b5fd-dcf1-4658-bacc-6e3e5a0cf1a0" />
 
 https://github.com/strimzi/strimzi-kafka-operator/tree/0.43.0/examples/metrics/grafana-dashboards
