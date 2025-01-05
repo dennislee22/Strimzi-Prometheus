@@ -130,10 +130,10 @@ spec:
 podmonitors.monitoring.coreos.com                     2025-01-05T00:44:10Z
 ```
 
-4. Apply `strimzi-pod-monitor.yaml` in your existing prometheus namespace.
+4. Apply `strimzi-pod-monitor.yml` in your existing prometheus namespace.
 
 ```
-# kubectl -n infra-prometheus apply -f strimzi-pod-monitor.yaml 
+# kubectl -n infra-prometheus apply -f strimzi-pod-monitor.yml 
 ```
 
 5. Verify the successful creation of the following PodMonitor objects.
@@ -161,10 +161,9 @@ prometheus-infra-prometheus-operator-prometheus-0                 2/2     Runnin
 
 # kubectl -n infra-prometheus apply -f dlee-prometheus.yml
 
-# kubectl -n infra-prometheus get ingress
-NAME                                   CLASS    HOSTS                                        ADDRESS         PORTS   AGE
-infra-prometheus-operator-prometheus   <none>   infra-prometheus.apps.dlee1.cldr.example     10.129.83.133   80      9h
-strimzi-prometheus                     <none>   strimzi-prometheus.apps.dlee1.cldr.example   10.129.83.133   80      170m
+# # kubectl -n infra-prometheus get ingress strimzi-prometheus
+NAME                 CLASS    HOSTS                                        ADDRESS         PORTS   AGE
+strimzi-prometheus   <none>   strimzi-prometheus.apps.dlee1.cldr.example   10.129.83.133   80      4h40m
 
 # kubectl -n infra-prometheus get pods
 NAME                                                              READY   STATUS    RESTARTS       AGE
@@ -182,7 +181,7 @@ prometheus-strimzi-prometheus-0                                   2/2     Runnin
 7. Create the `prometheus-k8s-rules` PrometheusRule object.
 
 ```
-# kubectl -n infra-prometheus apply -f prometheus-rules.yaml
+# kubectl -n infra-prometheus apply -f prometheus-rules.yml
 
 # kubectl -n infra-prometheus get PrometheusRule prometheus-k8s-rules
 NAME                   AGE
@@ -195,7 +194,7 @@ prometheus-k8s-rules   5h28m
 9. Create a new Prometheus dashboard service in the K8s cluster. The internal URL endpoint of this service will later be used as the datasource in Grafana.
 
 ```
-# kubectl -n infra-prometheus apply -f strimzi-prometheus-svc.yaml
+# kubectl -n infra-prometheus apply -f strimzi-prometheus-svc.yml
 
 # kubectl -n infra-prometheus get svc strimzi-prometheus
 NAME                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)             AGE
