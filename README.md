@@ -6,7 +6,7 @@ Integrating Strimzi with Prometheus and Grafana provides a robust solution for m
 
 In this article, I will deploy the [Cloudera Streams Messaging Operator](https://docs.cloudera.com/csm-operator/1.2/index.html), which is based on Strimzi, and integrate the Kafka cluster with the existing Prometheus and Grafana platforms.
 
-<img width="693" alt="image" src="https://github.com/user-attachments/assets/2a53dde3-261c-411a-82ae-6515c2ac8282" />
+<img width="687" alt="image" src="https://github.com/user-attachments/assets/6db57df5-5158-4f6a-aa2c-64913f47b30e" />
 
 ## Deploy `Streams Messaging Operator` with Strimzi
 
