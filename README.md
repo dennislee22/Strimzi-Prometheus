@@ -44,6 +44,8 @@ strimzi-cluster-operator-56c85645-6xswd   1/1     Running   0          41s
 ```
 
 ## Deploy `Kafka Node Pool`
+Kafka node pools refer to groups of Kafka broker nodes that share similar configurations and resources within a Kafka cluster. By using node pools, operators can tailor resource allocation, scaling, and fault tolerance across different broker nodes, ensuring optimal performance and isolation for varying workloads or traffic patterns.
+
 1. Create a new namespace.
 ```
 # kubectl create ns dlee-kafkanodepool
