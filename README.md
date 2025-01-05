@@ -38,7 +38,7 @@ strimzi                                          kubernetes.io/dockerconfigjson 
 ```
 
 ```
-# kubectl -n strimzi-kafka get pods`
+# kubectl -n strimzi-kafka get pods
 NAME                                      READY   STATUS    RESTARTS   AGE
 strimzi-cluster-operator-56c85645-6xswd   1/1     Running   0          41s
 ```
