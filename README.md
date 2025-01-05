@@ -147,7 +147,7 @@ entity-operator-metrics    3h51m
 kafka-resources-metrics    3h51m
 ```
 
-6. Create an instance/pod of `prometheus` object for Strimzi.
+6. Create an instance/pod of `prometheus` object for Strimzi by applying `dlee-prometheus.yml` in the existing prometheus namespace `infra-prometheus`.
 ```
 # kubectl -n infra-prometheus get pods
 NAME                                                              READY   STATUS    RESTARTS       AGE
@@ -161,7 +161,7 @@ prometheus-infra-prometheus-operator-prometheus-0                 2/2     Runnin
 
 # kubectl -n infra-prometheus apply -f dlee-prometheus.yml
 
-# # kubectl -n infra-prometheus get ingress strimzi-prometheus
+# kubectl -n infra-prometheus get ingress strimzi-prometheus
 NAME                 CLASS    HOSTS                                        ADDRESS         PORTS   AGE
 strimzi-prometheus   <none>   strimzi-prometheus.apps.dlee1.cldr.example   10.129.83.133   80      4h40m
 
