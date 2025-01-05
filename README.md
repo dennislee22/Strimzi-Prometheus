@@ -178,7 +178,7 @@ prometheus-strimzi-prometheus-0                                   2/2     Runnin
 
 ```
 
-7. Create the `prometheus-k8s-rules` PrometheusRule object.
+7. Create a new `PrometheusRule` object by applying `prometheus-k8s-rules`.
 
 ```
 # kubectl -n infra-prometheus apply -f prometheus-rules.yml
