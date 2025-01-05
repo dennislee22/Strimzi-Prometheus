@@ -180,7 +180,7 @@ prometheus-strimzi-prometheus-0                                   2/2     Runnin
 
 ```
 
-7. Create a new `PrometheusRule` object by applying `prometheus-k8s-rules`.
+7. Create a new `PrometheusRule` object by applying `prometheus-rules.yml`.
 
 ```
 # kubectl -n infra-prometheus apply -f prometheus-rules.yml
@@ -190,7 +190,7 @@ NAME                   AGE
 prometheus-k8s-rules   5h28m
 ```
 
-8. Prometheus can now scrape the Kakfa metrics. You may check out the Prometheus dashboard to verify this.
+8. Subsequently, Prometheus can now scrape the Kakfa metrics. You may check out the Prometheus dashboard to verify this.
 <img width="1436" alt="image" src="https://github.com/user-attachments/assets/1edf6f84-7b3d-4849-8825-78168e83b68d" />
 
 9. Create a new Prometheus dashboard service in the K8s cluster. The internal URL endpoint of this service will later be used as the datasource in Grafana.
