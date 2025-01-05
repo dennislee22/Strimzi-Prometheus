@@ -81,7 +81,9 @@ data-my-cluster-zookeeper-1      Bound    pvc-d6641d3c-d833-4b8f-b473-e470b71c36
 data-my-cluster-zookeeper-2      Bound    pvc-555299e5-d5f3-4a84-957a-49f07df0c6ff   100Gi      RWO            longhorn       3m50s
 ```
 
-4. The Kafka cluster above is not yet configured for metrics collection. To enable this, create a ConfigMap containing the JMX metrics configuration for both Kafka and ZooKeeper.
+## Post-Deployment Configuration
+
+1. The Kafka cluster above is not yet configured for metrics collection. To enable this, create a ConfigMap containing the JMX metrics configuration for both Kafka and ZooKeeper.
 
 ```
 # kubectl -n dlee-kafkanodepool apply -f kafka-metrics-cm.yml
@@ -99,11 +101,10 @@ my-cluster-first-pool-2                   5      6h45m
 my-cluster-zookeeper-config               3      6h46m
 ```
 
-5. Edit kafka object to include the following configuration.
+2. Edit kafka object to include the following configuration.
 ```
 # kubectl -n dlee-kafkanodepool edit kafka
 
-#...
 kind: Kafka
 spec:
   kafka:
@@ -121,7 +122,64 @@ spec:
           name: kafka-metrics
           key: zookeeper-metrics-config.yml
 ```
-   
+
+3. Ensure that `podmonitor` CRD has already been created in your K8s cluster.
+
+```
+# kubectl get crds | grep podmonitor
+podmonitors.monitoring.coreos.com                     2025-01-05T00:44:10Z
+```
+
+4. Apply `strimzi-pod-monitor.yaml` in your existing prometheus namespace.
+
+```
+# kubectl -n infra-prometheus apply -f strimzi-pod-monitor.yaml 
+```
+
+5. Verify the successful creation of the following PodMonitor objects.
+
+```
+# kubectl -n infra-prometheus get podmonitor
+NAME                       AGE
+bridge-metrics             3h51m
+cluster-operator-metrics   3h51m
+entity-operator-metrics    3h51m
+kafka-resources-metrics    3h51m
+```
+
+6. Create an instance/pod of `prometheus` object for Strimzi.
+```
+# kubectl -n infra-prometheus get pods
+NAME                                                              READY   STATUS    RESTARTS       AGE
+infra-prometheus-operator-1-1736037852-kube-state-metrics-pdl88   1/1     Running   1 (35m ago)    9h
+infra-prometheus-operator-1-1736037852-prometheus-node-exp42phq   1/1     Running   29 (38m ago)   9h
+infra-prometheus-operator-1-1736037852-prometheus-node-exp8vrvq   1/1     Running   28 (39m ago)   9h
+infra-prometheus-operator-1-1736037852-prometheus-node-expshqnk   1/1     Running   28 (37m ago)   9h
+infra-prometheus-operator-1-1736037852-prometheus-node-expvmjxl   1/1     Running   4 (29m ago)    9h
+infra-prometheus-operator-operator-fcc6f7f69-kp2sj                1/1     Running   1 (35m ago)    9h
+prometheus-infra-prometheus-operator-prometheus-0                 2/2     Running   0              9h
+
+# kubectl -n infra-prometheus apply -f dlee-prometheus.yml
+
+# kubectl -n infra-prometheus get ingress
+NAME                                   CLASS    HOSTS                                        ADDRESS         PORTS   AGE
+infra-prometheus-operator-prometheus   <none>   infra-prometheus.apps.dlee1.cldr.example     10.129.83.133   80      9h
+strimzi-prometheus                     <none>   strimzi-prometheus.apps.dlee1.cldr.example   10.129.83.133   80      170m
+
+# kubectl -n infra-prometheus get pods
+NAME                                                              READY   STATUS    RESTARTS       AGE
+infra-prometheus-operator-1-1736037852-kube-state-metrics-pdl88   1/1     Running   1 (35m ago)    9h
+infra-prometheus-operator-1-1736037852-prometheus-node-exp42phq   1/1     Running   29 (38m ago)   9h
+infra-prometheus-operator-1-1736037852-prometheus-node-exp8vrvq   1/1     Running   28 (39m ago)   9h
+infra-prometheus-operator-1-1736037852-prometheus-node-expshqnk   1/1     Running   28 (37m ago)   9h
+infra-prometheus-operator-1-1736037852-prometheus-node-expvmjxl   1/1     Running   4 (29m ago)    9h
+infra-prometheus-operator-operator-fcc6f7f69-kp2sj                1/1     Running   1 (35m ago)    9h
+prometheus-infra-prometheus-operator-prometheus-0                 2/2     Running   0              9h
+prometheus-strimzi-prometheus-0                                   2/2     Running   2 (3s ago)     3s
+
+```
+
+4. Create a new `prometheus` object in your existing Prometheus namespace.
 <img width="1432" alt="image" src="https://github.com/user-attachments/assets/74b5b5fd-dcf1-4658-bacc-6e3e5a0cf1a0" />
 
 https://github.com/strimzi/strimzi-kafka-operator/tree/0.43.0/examples/metrics/grafana-dashboards
