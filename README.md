@@ -83,6 +83,38 @@ data-my-cluster-zookeeper-1      Bound    pvc-d6641d3c-d833-4b8f-b473-e470b71c36
 data-my-cluster-zookeeper-2      Bound    pvc-555299e5-d5f3-4a84-957a-49f07df0c6ff   100Gi      RWO            longhorn       3m50s
 ```
 
+4. Run the following Kafka producer and consumer tests to verify that the Kafka cluster is operating correctly.
+```
+# IMAGE=$(kubectl get pod my-cluster-first-pool-0  -n dlee-kafkanodepool --output jsonpath='{.spec.containers[0].image}')
+# NAMESPACE=dlee-kafkanodepool
+# CLUSTER=my-cluster
+
+# kubectl run kafka-admin -it -n $NAMESPACE --image=$IMAGE --rm=true --restart=Never --command -- /opt/kafka/bin/kafka-topics.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --create --topic anytopic1
+Defaulted container "kafka-admin" out of: kafka-admin, k8tz (init)
+If you don't see a command prompt, try pressing enter.
+Created topic anytopic1.
+pod "kafka-admin" deleted
+
+# kubectl run kafka-producer -it -n $NAMESPACE --image=$IMAGE --rm=true --restart=Never --command -- /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic anytopic1 
+Defaulted container "kafka-producer" out of: kafka-producer, k8tz (init)
+If you don't see a command prompt, try pressing enter.
+>Dennis Lee
+>is
+>in the 
+>house
+>^C
+E0106 06:06:06.531241 2809223 v2.go:104] EOF
+pod "kafka-producer" deleted
+
+# kubectl run kafka-consumer -it -n $NAMESPACE --image=$IMAGE --rm=true --restart=Never --command -- /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic anytopic1 --from-beginning
+Defaulted container "kafka-consumer" out of: kafka-consumer, k8tz (init)
+If you don't see a command prompt, try pressing enter.
+Dennis Lee
+is
+in the
+house
+```
+
 ## Post-Deployment Configuration
 
 1. The Kafka cluster above is not yet configured for metrics collection. To enable this, create a ConfigMap containing the JMX metrics configuration for both Kafka and ZooKeeper.
