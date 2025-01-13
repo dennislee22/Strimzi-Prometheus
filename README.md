@@ -4,7 +4,7 @@
 
 Integrating Strimzi with Prometheus and Grafana provides a robust solution for monitoring and visualizing the health and performance of Apache Kafka clusters in Kubernetes. Strimzi, a Kubernetes Operator for managing Kafka, exposes various metrics through Prometheus exporters that can be scraped and stored by Prometheus. These metrics include Kafka broker health, throughput, and resource usage. Grafana is then used to create custom dashboards, offering visualizations of the Kafka metrics. This integration empowers DevOps teams to monitor Kafka clusters effectively, gain insights into performance bottlenecks, and ensure the system's reliability in production environments.
 
-In this article, I will deploy the [Cloudera Streams Messaging Operator](https://docs.cloudera.com/csm-operator/1.2/index.html), which is based on Strimzi, and integrate the Kafka cluster with the existing Prometheus and Grafana platforms.
+In this article, I will outline the steps to deploy [Cloudera Streams Messaging Operator](https://docs.cloudera.com/csm-operator/1.2/index.html), using Strimzi on Kubernetes platform, and demonstrate how to integrate the Kafka cluster with existing Prometheus and Grafana platforms.
 
 <img width="687" alt="image" src="https://github.com/user-attachments/assets/6db57df5-5158-4f6a-aa2c-64913f47b30e" />
 
