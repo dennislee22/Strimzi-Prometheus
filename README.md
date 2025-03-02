@@ -181,7 +181,7 @@ entity-operator-metrics    3h51m
 kafka-resources-metrics    3h51m
 ```
 
-6. Create an instance/pod of `prometheus` object for Strimzi by applying `dlee-prometheus.yml` in the existing prometheus namespace `infra-prometheus`.
+6. In the current K8s platform, there is an existing namespace hosting prometheus server pod. Create an instance/pod of `prometheus` object for Strimzi by applying `dlee-prometheus.yml` in the existing prometheus namespace `infra-prometheus`.
 ```
 # kubectl -n infra-prometheus get pods
 NAME                                                              READY   STATUS    RESTARTS       AGE
@@ -209,7 +209,46 @@ infra-prometheus-operator-1-1736037852-prometheus-node-expvmjxl   1/1     Runnin
 infra-prometheus-operator-operator-fcc6f7f69-kp2sj                1/1     Running   1 (35m ago)    9h
 prometheus-infra-prometheus-operator-prometheus-0                 2/2     Running   0              9h
 prometheus-strimzi-prometheus-0                                   2/2     Running   2 (3s ago)     3s
+```
 
+**Note**: `dlee-prometheus.yml` is leveraging the existing ClusterRole, ServiceAccount and its associated ClusterRoleBinding.
+
+```
+# kubectl -n infra-prometheus get ClusterRole infra-prometheus-operator-prometheus -o yaml | grep -A999 rules
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - nodes/metrics
+  - services
+  - endpoints
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- nonResourceURLs:
+  - /metrics
+  - /metrics/cadvisor
+  verbs:
+  - get
+```
+
+```
+# kubectl -n infra-prometheus get ClusterRoleBinding infra-prometheus-operator-prometheus -o yaml | grep -A99 subjects
+subjects:
+- kind: ServiceAccount
+  name: infra-prometheus-operator-prometheus
+  namespace: infra-prometheus
 ```
 
 7. Create a new `PrometheusRule` object by applying the `prometheus-rules.yml` file.
